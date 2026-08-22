@@ -1,0 +1,23 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "TLM"
+            }
+        ],
+        "Category": "System Information",
+        "Description": "Reset Bluetooth and reliably connect the VN130 headset",
+        "EnabledByDefault": true,
+        "Icon": "audio-headset-bluetooth",
+        "Id": "org.local.vn130connector",
+        "License": "MIT",
+        "Name": "VN130 Controller",
+        "Version": "1.0.0"
+    },
+    "X-Plasma-API": "declarativeappletscript",
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-MainScript": "ui/main.qml",
+    "X-Plasma-NotificationArea": "true",
+    "X-Plasma-NotificationAreaCategory": "Hardware"
+}
