@@ -7,13 +7,13 @@
             }
         ],
         "Category": "System Information",
-        "Description": "Reset Bluetooth and reliably connect the VN130 headset",
+        "Description": "Reset Bluetooth and reliably connect a configured headset",
         "EnabledByDefault": true,
         "Icon": "audio-headset-bluetooth",
         "Id": "org.local.vn130connector",
         "License": "MIT",
         "Name": "VN130 Controller",
-        "Version": "1.0.0"
+        "Version": "1.1.0"
     },
     "X-Plasma-API": "declarativeappletscript",
     "X-Plasma-API-Minimum-Version": "6.0",

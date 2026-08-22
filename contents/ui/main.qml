@@ -16,8 +16,19 @@ import org.kde.plasma.plasmoid
 PlasmoidItem {
     id: root
 
-    readonly property string deviceAddress: "AC:EC:8A:52:BB:46"
-    readonly property int maximumAttempts: 2
+    readonly property string configuredDeviceName: {
+        const name = String(Plasmoid.configuration.deviceName || "").trim();
+        return name.length > 0 ? name : "VN130";
+    }
+    readonly property string deviceAddress: {
+        const address = String(Plasmoid.configuration.deviceAddress || "").trim().toUpperCase();
+        return address.length > 0 ? address : "AC:EC:8A:52:BB:46";
+    }
+    readonly property int maximumAttempts: Math.max(1, Math.min(10, Number(Plasmoid.configuration.maximumAttempts) || 2))
+    readonly property int powerOffDelayMs: Math.max(500, Math.min(10000, Number(Plasmoid.configuration.powerOffDelayMs) || 2000))
+    readonly property int powerOnDelayMs: Math.max(500, Math.min(10000, Number(Plasmoid.configuration.powerOnDelayMs) || 2500))
+    readonly property int connectionTimeoutMs: Math.max(5000, Math.min(120000, Number(Plasmoid.configuration.connectionTimeoutMs) || 38000))
+    readonly property int verificationDurationMs: Math.max(5000, Math.min(120000, Number(Plasmoid.configuration.verificationDurationMs) || 32000))
 
     property var adapter: BluezQt.Manager.usableAdapter
     property var device: BluezQt.Manager.deviceForAddress(deviceAddress)
@@ -41,12 +52,12 @@ PlasmoidItem {
             return "Bluetooth is off";
         }
         if (!deviceAvailable) {
-            return "VN130 is unavailable";
+            return configuredDeviceName + " is unavailable";
         }
         if (deviceConnected) {
-            return "VN130 is connected";
+            return configuredDeviceName + " is connected";
         }
-        return "VN130 is disconnected";
+        return configuredDeviceName + " is disconnected";
     }
 
     function refreshObjects() {
@@ -123,7 +134,7 @@ PlasmoidItem {
         operationWatchdog.stop();
         phase = "offDelay";
         message = "Bluetooth is off; waiting…";
-        transitionTimer.interval = 2000;
+        transitionTimer.interval = powerOffDelayMs;
         transitionTimer.action = "powerOn";
         transitionTimer.restart();
     }
@@ -158,8 +169,8 @@ PlasmoidItem {
         }
         operationWatchdog.stop();
         phase = "onDelay";
-        message = "Bluetooth is on; preparing VN130…";
-        transitionTimer.interval = 2500;
+        message = "Bluetooth is on; preparing " + configuredDeviceName + "…";
+        transitionTimer.interval = powerOnDelayMs;
         transitionTimer.action = "connect";
         transitionTimer.restart();
     }
@@ -172,13 +183,13 @@ PlasmoidItem {
 
         refreshObjects();
         if (device === null) {
-            retryOrFail("VN130 is not known to BlueZ");
+            retryOrFail(configuredDeviceName + " is not known to BlueZ");
             return;
         }
 
         phase = "connecting";
-        message = "Attempt " + attempt + ": connecting VN130…";
-        connectionTimeout.interval = 38000;
+        message = "Attempt " + attempt + ": connecting " + configuredDeviceName + "…";
+        connectionTimeout.interval = connectionTimeoutMs;
         connectionTimeout.restart();
         device.connectToDevice();
     }
@@ -188,9 +199,9 @@ PlasmoidItem {
             return;
         }
         phase = "verifying";
-        message = "VN130 connected; verifying stability…";
+        message = configuredDeviceName + " connected; verifying stability…";
         // The observed faulty connection drops after roughly 28 seconds.
-        verificationTimer.interval = 32000;
+        verificationTimer.interval = verificationDurationMs;
         verificationTimer.restart();
     }
 
@@ -200,7 +211,7 @@ PlasmoidItem {
         }
         verificationTimer.stop();
         connectionTimeout.stop();
-        retryOrFail("VN130 disconnected during authentication");
+        retryOrFail(configuredDeviceName + " disconnected during authentication");
     }
 
     function retryOrFail(reason) {
@@ -226,7 +237,7 @@ PlasmoidItem {
         stopTimers();
         busy = false;
         phase = "connected";
-        message = "VN130 connected successfully";
+        message = configuredDeviceName + " connected successfully";
     }
 
     function fail(reason) {
@@ -257,8 +268,15 @@ PlasmoidItem {
         if (device !== null && device.connected) {
             device.disconnectFromDevice();
             phase = "idle";
-            message = "Disconnecting VN130…";
+            message = "Disconnecting " + configuredDeviceName + "…";
         }
+    }
+
+    onDeviceAddressChanged: {
+        if (busy) {
+            cancel();
+        }
+        refreshObjects();
     }
 
     Plasmoid.title: "VN130 Controller"
@@ -374,7 +392,9 @@ PlasmoidItem {
                 rowSpacing: Kirigami.Units.smallSpacing
 
                 PlasmaComponents3.Label { text: "Device"; opacity: 0.65 }
-                PlasmaComponents3.Label { text: "VN130" }
+                PlasmaComponents3.Label { text: root.configuredDeviceName }
+                PlasmaComponents3.Label { text: "Address"; opacity: 0.65 }
+                PlasmaComponents3.Label { text: root.deviceAddress }
                 PlasmaComponents3.Label { text: "Bluetooth"; opacity: 0.65 }
                 PlasmaComponents3.Label { text: root.adapterPowered ? "On" : "Off" }
                 PlasmaComponents3.Label { text: "Connection"; opacity: 0.65 }
@@ -437,7 +457,7 @@ PlasmoidItem {
     Timer {
         id: connectionTimeout
         repeat: false
-        onTriggered: root.retryOrFail("VN130 connection timed out")
+        onTriggered: root.retryOrFail(root.configuredDeviceName + " connection timed out")
     }
 
     Timer {
@@ -448,7 +468,7 @@ PlasmoidItem {
             if (root.deviceConnected) {
                 root.succeed();
             } else {
-                root.retryOrFail("VN130 did not remain connected");
+                root.retryOrFail(root.configuredDeviceName + " did not remain connected");
             }
         }
     }
@@ -507,7 +527,7 @@ PlasmoidItem {
         refreshObjects();
         if (deviceConnected) {
             phase = "connected";
-            message = "VN130 is connected";
+            message = configuredDeviceName + " is connected";
         }
     }
 }

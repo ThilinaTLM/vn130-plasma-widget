@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+    <kcfgfile name=""/>
+
+    <group name="General">
+        <entry name="deviceName" type="String">
+            <label>Friendly name shown for the Bluetooth device.</label>
+            <default>VN130</default>
+        </entry>
+        <entry name="deviceAddress" type="String">
+            <label>Bluetooth MAC address of the paired device.</label>
+            <default>AC:EC:8A:52:BB:46</default>
+        </entry>
+        <entry name="maximumAttempts" type="Int">
+            <label>Maximum number of reset and connection attempts.</label>
+            <default>2</default>
+        </entry>
+        <entry name="powerOffDelayMs" type="Int">
+            <label>Time to wait after turning Bluetooth off.</label>
+            <default>2000</default>
+        </entry>
+        <entry name="powerOnDelayMs" type="Int">
+            <label>Time to wait after turning Bluetooth on.</label>
+            <default>2500</default>
+        </entry>
+        <entry name="connectionTimeoutMs" type="Int">
+            <label>Maximum time allowed for a connection attempt.</label>
+            <default>38000</default>
+        </entry>
+        <entry name="verificationDurationMs" type="Int">
+            <label>Time the connection must remain stable before it succeeds.</label>
+            <default>32000</default>
+        </entry>
+    </group>
+</kcfg>

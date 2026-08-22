@@ -1,16 +1,17 @@
 # VN130 Controller — Plasma 6 widget
 
-A small KDE Plasma panel widget for the VN130 Bluetooth headset at
-`AC:EC:8A:52:BB:46`.
+A small KDE Plasma panel widget for reliably connecting a paired Bluetooth
+headset. It defaults to the VN130 at `AC:EC:8A:52:BB:46`, but the target device
+and connection behavior are configurable per widget instance.
 
-The headset sometimes times out during its first Bluetooth authentication. The
+The VN130 sometimes times out during its first Bluetooth authentication. The
 widget applies the practical workaround in one action:
 
 1. turn the Bluetooth adapter off;
 2. wait briefly and turn it on;
-3. connect VN130;
+3. connect the configured device;
 4. verify the connection remains stable;
-5. reset and retry once if it disconnects.
+5. reset and retry if it disconnects.
 
 It uses KDE's BluezQt API directly. It does not use `sudo`, parse
 `bluetoothctl`, alter pairing information, or replace KDE's normal Bluetooth
@@ -18,19 +19,16 @@ widget.
 
 ## Install
 
-From this repository:
+Run the installer from this repository:
 
 ```bash
-kpackagetool6 --type Plasma/Applet --install ./vn130-plasma-widget
+./install.sh
 ```
 
-For an existing installation:
+The script installs or upgrades the applet for the current user. Plasma
+registers it as a system tray applet; no root access is needed.
 
-```bash
-kpackagetool6 --type Plasma/Applet --upgrade ./vn130-plasma-widget
-```
-
-Then add it to the system tray:
+Then make it visible in the system tray:
 
 1. Right-click the system tray and open **Configure System Tray…**.
 2. Open **Entries**.
@@ -38,31 +36,51 @@ Then add it to the system tray:
 
 It can still be added as a standalone panel widget through **Add Widgets** if preferred.
 
+## Configure
+
+Open the widget's **Configure…** dialog and select **Device & Connection**. The
+page provides:
+
+- a friendly device name used in the popup and status messages;
+- the paired device's Bluetooth MAC address;
+- the maximum number of reset/connect attempts;
+- waits after powering Bluetooth off and back on;
+- the timeout for each connection attempt;
+- the stability-check duration before a connection is reported as successful.
+
+The defaults preserve the original VN130 behavior: two attempts, 2 seconds
+after power-off, 2.5 seconds after power-on, a 38-second connection timeout,
+and a 32-second stability check. Shortening the stability check can miss the
+diagnosed VN130 failure, which occurs after roughly 28 seconds.
+
+The configured device must already be paired. The widget deliberately never
+removes or creates pairings.
+
 ## Use
 
-- When disconnected, click the panel icon to run **Reset & Connect** directly.
+- When disconnected, click the panel icon to run the reset/connect workflow directly.
 - When connected or while working, click the icon to open its status popup.
-- The popup provides **Reconnect VN130**, **Disconnect**, and **Cancel**.
-- The icon remains busy while it verifies the connection. This takes about 32
-  seconds because the diagnosed VN130 failure occurs after roughly 28 seconds.
+- The popup provides **Connect** or **Reconnect**, **Disconnect**, and **Cancel** actions.
+- The icon remains busy while the configured stability check runs.
 
 > Resetting the adapter temporarily disconnects every Bluetooth device, not
-> only VN130.
-
-VN130 must already be paired. The widget deliberately never removes or creates
-pairings.
+> only the configured headset.
 
 ## Uninstall
 
-Remove the widget from the panel, then run:
+Run:
 
 ```bash
-kpackagetool6 --type Plasma/Applet --remove org.local.vn130connector
+./uninstall.sh
 ```
+
+The script removes the current user's applet package. If Plasma retains a stale
+tray entry, restart Plasma or sign out and back in.
 
 ## Troubleshooting
 
-Check the paired device and adapter:
+Check the configured paired device and adapter, replacing the sample address if
+needed:
 
 ```bash
 bluetoothctl info AC:EC:8A:52:BB:46
