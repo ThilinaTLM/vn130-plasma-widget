@@ -280,7 +280,9 @@ PlasmoidItem {
     }
 
     Plasmoid.title: "VN130 Controller"
-    Plasmoid.icon: deviceConnected ? "audio-headset-bluetooth" : "bluetooth"
+    // Use icon names provided by Breeze. The generic "bluetooth" name is
+    // absent there and left a blank tray slot while the device was offline.
+    Plasmoid.icon: deviceConnected ? "audio-headset" : "network-bluetooth"
     Plasmoid.status: deviceConnected || busy ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus
     toolTipSubText: stateText
 
@@ -328,7 +330,7 @@ PlasmoidItem {
                 Kirigami.Icon {
                     Layout.preferredWidth: Kirigami.Units.iconSizes.medium
                     Layout.preferredHeight: Kirigami.Units.iconSizes.medium
-                    source: "audio-headset-bluetooth"
+                    source: "audio-headset"
                 }
 
                 Kirigami.Heading {

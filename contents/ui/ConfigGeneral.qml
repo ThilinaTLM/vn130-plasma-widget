@@ -32,6 +32,13 @@ KCM.SimpleKCM {
     }
 
     Kirigami.FormLayout {
+        id: formLayout
+
+        // Keep controls clear of the overlaid vertical scrollbar and allow
+        // long explanatory text to wrap inside the dialog viewport.
+        Layout.fillWidth: true
+        Layout.rightMargin: Kirigami.Units.largeSpacing * 2
+
         Kirigami.Separator {
             Kirigami.FormData.isSection: true
             Kirigami.FormData.label: "Device"
@@ -88,6 +95,7 @@ KCM.SimpleKCM {
 
         Kirigami.InlineMessage {
             Layout.fillWidth: true
+            Layout.minimumWidth: 0
             type: Kirigami.MessageType.Information
             text: "The Bluetooth device must already be paired. This widget never creates or removes pairings."
             visible: true
@@ -149,6 +157,7 @@ KCM.SimpleKCM {
 
         QQC2.Label {
             Layout.fillWidth: true
+            Layout.minimumWidth: 0
             text: "Each attempt resets the Bluetooth adapter, temporarily disconnecting every Bluetooth device. The stability check waits for delayed authentication failures before reporting success."
             opacity: 0.75
             wrapMode: Text.Wrap
